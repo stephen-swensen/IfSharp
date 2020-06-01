@@ -1,7 +1,7 @@
 
 # NOTE: If you modify this base image to use a different Linux distro
 # then the install of the dotnet SDK may need to be changed
-FROM mono:5.20.1.19
+FROM mono:6.6.0.161-slim
 
 # Install Anaconda (conda / miniconda)
 RUN apt update \
@@ -24,7 +24,7 @@ RUN wget -q https://packages.microsoft.com/config/debian/9/prod.list
 RUN mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
 RUN chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
 RUN chown root:root /etc/apt/sources.list.d/microsoft-prod.list
-RUN apt-get update && apt-get install -y dotnet-sdk-2.2=2.2.105-1 && rm -rf /var/lib/opt/lists
+RUN apt-get update && apt-get install -y dotnet-sdk-3.1 && rm -rf /var/lib/opt/lists
 
 # Test conda to ensure the above worked.
 RUN conda -V
@@ -37,7 +37,7 @@ RUN conda install -c conda-forge jupyter_nbextensions_configurator
 
 # Install IfSharp
 WORKDIR /
-RUN git clone https://github.com/fsprojects/IfSharp.git
+RUN git clone https://github.com/stephen-swensen/IfSharp.git
 RUN mkdir notebooks
 VOLUME notebooks
 
@@ -47,7 +47,7 @@ RUN chown -R ifsharp-user /notebooks && chown -R ifsharp-user /IfSharp
 USER ifsharp-user
 
 WORKDIR /IfSharp
-RUN ./fake.sh build --target BuildNetFramework
+RUN /bin/bash fake.sh build --target BuildNetFramework
 RUN mono src/IfSharp/bin/Release/ifsharp.exe --install
 
 # Install extensions and configurator
